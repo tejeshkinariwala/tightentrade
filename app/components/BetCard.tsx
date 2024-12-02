@@ -177,7 +177,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
               type="number"
               value={newBid}
               onChange={(e) => setNewBid(Number(e.target.value))}
-              className="flex-1 p-2 border rounded"
+              className="w-20 p-2 border rounded"
               placeholder="Bid"
               disabled={bet.isTraded}
             />
@@ -194,7 +194,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
               type="number"
               value={newAsk}
               onChange={(e) => setNewAsk(Number(e.target.value))}
-              className="flex-1 p-2 border rounded"
+              className="w-20 p-2 border rounded"
               placeholder="Ask"
               disabled={bet.isTraded}
             />
