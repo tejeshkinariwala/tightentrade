@@ -1,37 +1,37 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
 }
 
 model User {
   id           String        @id @default(cuid())
   username     String        @unique
   createdBets  Bet[]        @relation("Creator")
+  createdTrades Trade[]     @relation("Maker")
+  takenTrades   Trade[]     @relation("Taker")
+  boughtTrades  Trade[]     @relation("Buyer")
+  soldTrades    Trade[]     @relation("Seller")
   priceUpdates PriceUpdate[]
-  buyTrades    Trade[]      @relation("Buyer")
-  sellTrades   Trade[]      @relation("Seller")
-  makerTrades  Trade[]      @relation("Maker")
-  takerTrades  Trade[]      @relation("Taker")
 }
 
 model Bet {
-  id           String        @id @default(cuid())
-  eventName    String
-  notional     Float
-  currentBid   Float        @default(0)
-  currentAsk   Float        @default(100)
-  isTraded     Boolean      @default(false)
-  isSettled    Boolean      @default(false)
-  eventResult  Boolean?
-  creator      User         @relation("Creator", fields: [creatorId], references: [id])
-  creatorId    String
-  trades       Trade[]
+  id          String       @id @default(cuid())
+  eventName   String
+  notional    Int
+  currentBid  Int
+  currentAsk  Int
+  isTraded    Boolean     @default(false)
+  isSettled   Boolean     @default(false)
+  eventResult Boolean?
+  creator     User        @relation("Creator", fields: [creatorId], references: [id])
+  creatorId   String
+  trades      Trade[]
   priceUpdates PriceUpdate[]
-  createdAt    DateTime     @default(now())
+  createdAt   DateTime    @default(now())
 }
 
 model Trade {
@@ -42,12 +42,12 @@ model Trade {
   buyerId   String
   seller    User     @relation("Seller", fields: [sellerId], references: [id])
   sellerId  String
-  price     Float
   maker     User     @relation("Maker", fields: [makerId], references: [id])
   makerId   String
   taker     User     @relation("Taker", fields: [takerId], references: [id])
   takerId   String
-  createdAt DateTime @default(now())
+  price     Int
+  timestamp DateTime @default(now())
 }
 
 model PriceUpdate {
@@ -56,7 +56,7 @@ model PriceUpdate {
   betId     String
   updater   User     @relation(fields: [updaterId], references: [id])
   updaterId String
-  newBid    Float?
-  newAsk    Float?
-  timestamp DateTime @default(now())
+  newBid    Int?
+  newAsk    Int?
+  timestamp String
 } 

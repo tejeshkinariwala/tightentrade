@@ -8,17 +8,26 @@ export async function GET() {
       prisma.user.upsert({
         where: { username: 'Tejesh' },
         update: {},
-        create: { username: 'Tejesh' }
+        create: { 
+          id: 'tejesh-id',  // Add a fixed ID
+          username: 'Tejesh' 
+        }
       }),
       prisma.user.upsert({
         where: { username: 'Manu' },
         update: {},
-        create: { username: 'Manu' }
+        create: { 
+          id: 'manu-id',    // Add a fixed ID
+          username: 'Manu' 
+        }
       }),
       prisma.user.upsert({
         where: { username: 'Prakhar' },
         update: {},
-        create: { username: 'Prakhar' }
+        create: { 
+          id: 'prakhar-id', // Add a fixed ID
+          username: 'Prakhar' 
+        }
       })
     ]);
 
