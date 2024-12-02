@@ -62,12 +62,12 @@ export async function POST(request: Request) {
             {
               newBid: 0,
               updaterId: user.id,
-              timestamp: new Date()
+              timestamp: new Date().toISOString()
             },
             {
               newAsk: 100,
               updaterId: user.id,
-              timestamp: new Date()
+              timestamp: new Date().toISOString()
             }
           ]
         }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma, TransactionClient } from '../../../../lib/prisma'
+import type { PrismaClient } from '.prisma/client'
 
 export async function POST(
   request: Request,
