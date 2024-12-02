@@ -3,9 +3,9 @@
 import { USER_COLORS, Username } from '../constants/userColors';
 
 const ANIMAL_AVATARS = {
-  Tejesh: "🦁",
-  Manu: "🦊",
-  Prakhar: "🐯",
+  Tejesh: "🎨",
+  Manu: "🏏",
+  Prakhar: "🍿",
 };
 
 type AvatarProps = {

@@ -7,6 +7,8 @@ type TransactionClient = Omit<
   '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
 >
 
+export const runtime = 'nodejs'
+
 export async function PATCH(
   request: Request,
   { params }: { params: { id: string } }
