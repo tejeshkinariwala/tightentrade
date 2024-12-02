@@ -68,7 +68,11 @@ export default function Home() {
     init();
   }, []);
 
-  const handleUpdate = async (betId: string, type: 'bid' | 'ask', value: number) => {
+  const handleUpdate = async (
+    betId: string, 
+    type: 'bid' | 'ask' | 'notional', 
+    value: number
+  ) => {
     console.log('Updating bet:', { betId, type, value, profile: currentProfile.username });
     try {
       const response = await fetch(`/api/bets/${betId}`, {
@@ -81,9 +85,8 @@ export default function Home() {
         }),
       });
       
-      const data = await response.json();
-      
       if (!response.ok) {
+        const data = await response.json();
         console.error('Update failed:', data);
         alert(`Failed to update: ${data.error}`);
         return;
