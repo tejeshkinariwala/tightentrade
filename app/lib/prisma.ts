@@ -1,15 +1,15 @@
 import { PrismaClient } from '.prisma/client'
-import type { Prisma } from '.prisma/client'
 
-declare global {
-  var prisma: PrismaClient | undefined
+const prismaClientSingleton = () => {
+  return new PrismaClient({
+    log: ['query', 'error', 'warn'],
+  })
 }
 
-export const prisma = global.prisma || new PrismaClient()
+declare global {
+  var prisma: undefined | ReturnType<typeof prismaClientSingleton>
+}
 
-if (process.env.NODE_ENV !== 'production') global.prisma = prisma
+export const prisma = globalThis.prisma ?? prismaClientSingleton()
 
-export type TransactionClient = Omit<
-  PrismaClient,
-  '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
-> 
+if (process.env.NODE_ENV !== 'production') globalThis.prisma = prisma 

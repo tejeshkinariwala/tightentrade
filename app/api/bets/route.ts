@@ -3,6 +3,7 @@ import { prisma } from '../../lib/prisma';
 
 export async function GET() {
   try {
+    console.log('Fetching bets...');
     const bets = await prisma.bet.findMany({
       include: {
         creator: true,
@@ -27,11 +28,14 @@ export async function GET() {
         createdAt: 'desc',
       },
     });
-
+    console.log('Bets fetched:', bets);
     return NextResponse.json(bets);
   } catch (error) {
     console.error('GET Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ 
+      error: String(error),
+      details: error instanceof Error ? error.stack : undefined
+    }, { status: 500 });
   }
 }
 
