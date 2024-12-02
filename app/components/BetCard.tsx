@@ -227,19 +227,23 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
 
       <div className="mt-4">
         <h4 className="text-lg font-semibold">Settlement</h4>
-        <p className="text-gray-700">
-          {bet.eventResult ? (
-            // If event happened, buyer wins (100 - price)% of notional
-            `${lastTrade.buyer.username === lastTrade.seller.username ? 'No payment needed' : 
-              `${lastTrade.seller.username} owes ${lastTrade.buyer.username} $${(bet.notional * (100 - lastTrade.price) / 100).toFixed(2)}`
-            }`
-          ) : (
-            // If event didn't happen, seller wins price% of notional
-            `${lastTrade.buyer.username === lastTrade.seller.username ? 'No payment needed' : 
-              `${lastTrade.buyer.username} owes ${lastTrade.seller.username} $${(bet.notional * lastTrade.price / 100).toFixed(2)}`
-            }`
-          )}
-        </p>
+        {bet.isTraded && lastTrade ? (
+          <p className="text-gray-700">
+            {bet.eventResult ? (
+              // If event happened, buyer wins (100 - price)% of notional
+              `${lastTrade.buyer.username === lastTrade.seller.username ? 'No payment needed' : 
+                `${lastTrade.seller.username} owes ${lastTrade.buyer.username} $${(bet.notional * (100 - lastTrade.price) / 100).toFixed(2)}`
+              }`
+            ) : (
+              // If event didn't happen, seller wins price% of notional
+              `${lastTrade.buyer.username === lastTrade.seller.username ? 'No payment needed' : 
+                `${lastTrade.buyer.username} owes ${lastTrade.seller.username} $${(bet.notional * lastTrade.price / 100).toFixed(2)}`
+              }`
+            )}
+          </p>
+        ) : (
+          <p className="text-gray-500 italic">Not traded yet</p>
+        )}
       </div>
     </div>
   );
