@@ -170,33 +170,40 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
 
       <div className="flex flex-col gap-4 mb-4">
         <div className="flex gap-2">
-          <div className="flex-1">
+          <div className="flex-1 flex gap-2">
             <input
               type="number"
               value={newBid}
               onChange={(e) => setNewBid(Number(e.target.value))}
-              className="w-full p-2 border rounded"
+              className="flex-1 p-2 border rounded"
               placeholder="Bid"
               disabled={bet.isTraded}
             />
+            <button
+              onClick={handleBidUpdate}
+              disabled={bet.isTraded}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+            >
+              Update Bid
+            </button>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 flex gap-2">
             <input
               type="number"
               value={newAsk}
               onChange={(e) => setNewAsk(Number(e.target.value))}
-              className="w-full p-2 border rounded"
+              className="flex-1 p-2 border rounded"
               placeholder="Ask"
               disabled={bet.isTraded}
             />
+            <button
+              onClick={handleAskUpdate}
+              disabled={bet.isTraded}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+            >
+              Update Ask
+            </button>
           </div>
-          <button
-            onClick={handleBidUpdate}
-            disabled={bet.isTraded}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
-          >
-            Update
-          </button>
         </div>
 
         <div className="flex gap-2">
@@ -225,26 +232,39 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
         {/* ... price updates section stays the same ... */}
       </div>
 
-      <div className="mt-4">
-        <h4 className="text-lg font-semibold">Settlement</h4>
-        {bet.isTraded && lastTrade ? (
+      {bet.isTraded && !bet.isSettled && (
+        <div className="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+          <h4 className="text-lg font-semibold mb-2">Settle Bet</h4>
+          <p className="text-sm text-gray-600 mb-4">Did the event happen?</p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => onSettle(bet.id, true)}
+              className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => onSettle(bet.id, false)}
+              className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              No
+            </button>
+          </div>
+        </div>
+      )}
+
+      {bet.isTraded && bet.isSettled && lastTrade && (
+        <div className="mt-4">
+          <h4 className="text-lg font-semibold">Settlement</h4>
           <p className="text-gray-700">
             {bet.eventResult ? (
-              // If event happened, buyer wins (100 - price)% of notional
-              `${lastTrade.buyer.username === lastTrade.seller.username ? 'No payment needed' : 
-                `${lastTrade.seller.username} owes ${lastTrade.buyer.username} $${(bet.notional * (100 - lastTrade.price) / 100).toFixed(2)}`
-              }`
+              `${lastTrade.seller.username} owes ${lastTrade.buyer.username} $${(bet.notional * (100 - lastTrade.price) / 100).toFixed(2)}`
             ) : (
-              // If event didn't happen, seller wins price% of notional
-              `${lastTrade.buyer.username === lastTrade.seller.username ? 'No payment needed' : 
-                `${lastTrade.buyer.username} owes ${lastTrade.seller.username} $${(bet.notional * lastTrade.price / 100).toFixed(2)}`
-              }`
+              `${lastTrade.buyer.username} owes ${lastTrade.seller.username} $${(bet.notional * lastTrade.price / 100).toFixed(2)}`
             )}
           </p>
-        ) : (
-          <p className="text-gray-500 italic">Not traded yet</p>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 } 
