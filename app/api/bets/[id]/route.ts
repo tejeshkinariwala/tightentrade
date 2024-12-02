@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server'
-import { prisma, TransactionClient } from '../../../lib/prisma'
+import { prisma } from '../../../lib/prisma'
+import type { PrismaClient } from '@prisma/client'
+
+type TransactionClient = Omit<
+  PrismaClient,
+  '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
+>
 
 export async function PATCH(
   request: Request,
@@ -21,11 +27,10 @@ export async function PATCH(
     if (existingBet.isTraded) {
       return NextResponse.json({ error: 'Cannot update traded bet' }, { status: 400 });
     }
-
     // Update the bet and create price update in a transaction
-    const updatedBet = await prisma.$transaction(async (tx: TransactionClient) => {
+    const updatedBet = await prisma.$transaction(async (prisma: TransactionClient) => {
       // First update the bet
-      const bet = await tx.bet.update({
+      const bet = await prisma.bet.update({
         where: { id: params.id },
         data: {
           [type === 'bid' ? 'currentBid' : 'currentAsk']: value,
@@ -33,7 +38,7 @@ export async function PATCH(
       });
 
       // Then create the price update
-      await tx.priceUpdate.create({
+      await prisma.priceUpdate.create({
         data: {
           bet: { connect: { id: params.id } },
           updater: {
@@ -48,7 +53,7 @@ export async function PATCH(
       });
 
       // Finally fetch the updated bet with all relations
-      return tx.bet.findUnique({
+      return prisma.bet.findUnique({
         where: { id: params.id },
         include: {
           creator: true,
@@ -100,7 +105,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Bet not found' }, { status: 404 });
     }
     // Delete in a transaction to ensure all related records are deleted
-    await prisma.$transaction(async (tx: TransactionClient) => {
+    await prisma.$transaction(async (tx) => {
       // Delete trades first if they exist
       if (bet.trades.length > 0) {
         await tx.trade.deleteMany({

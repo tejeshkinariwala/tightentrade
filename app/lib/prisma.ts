@@ -1,5 +1,4 @@
 import { PrismaClient } from '@prisma/client'
-import type { Prisma } from '@prisma/client'
 
 declare global {
   var prisma: PrismaClient | undefined
@@ -9,4 +8,7 @@ export const prisma = global.prisma || new PrismaClient()
 
 if (process.env.NODE_ENV !== 'production') global.prisma = prisma
 
-export type TransactionClient = Parameters<PrismaClient['$transaction']>[0] 
+export type TransactionClient = Omit<
+  PrismaClient,
+  '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
+> 
