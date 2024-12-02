@@ -16,6 +16,8 @@ interface Bet {
   currentAsk: number;
   isTraded: boolean;
   isSettled: boolean;
+  eventResult?: boolean;
+  creator: { username: string };
   trades: Array<{
     buyer: { username: string };
     seller: { username: string };
