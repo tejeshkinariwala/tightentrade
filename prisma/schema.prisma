@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  username     String        @unique
+  createdBets  Bet[]        @relation("Creator")
+  priceUpdates PriceUpdate[]
+  buyTrades    Trade[]      @relation("Buyer")
+  sellTrades   Trade[]      @relation("Seller")
+  makerTrades  Trade[]      @relation("Maker")
+  takerTrades  Trade[]      @relation("Taker")
+}
+
+model Bet {
+  id           String        @id @default(cuid())
+  eventName    String
+  notional     Float
+  currentBid   Float        @default(0)
+  currentAsk   Float        @default(100)
+  isTraded     Boolean      @default(false)
+  isSettled    Boolean      @default(false)
+  eventResult  Boolean?
+  creator      User         @relation("Creator", fields: [creatorId], references: [id])
+  creatorId    String
+  trades       Trade[]
+  priceUpdates PriceUpdate[]
+  createdAt    DateTime     @default(now())
+}
+
+model Trade {
+  id        String   @id @default(cuid())
+  bet       Bet      @relation(fields: [betId], references: [id])
+  betId     String
+  buyer     User     @relation("Buyer", fields: [buyerId], references: [id])
+  buyerId   String
+  seller    User     @relation("Seller", fields: [sellerId], references: [id])
+  sellerId  String
+  price     Float
+  maker     User     @relation("Maker", fields: [makerId], references: [id])
+  makerId   String
+  taker     User     @relation("Taker", fields: [takerId], references: [id])
+  takerId   String
+  createdAt DateTime @default(now())
+}
+
+model PriceUpdate {
+  id        String   @id @default(cuid())
+  bet       Bet      @relation(fields: [betId], references: [id])
+  betId     String
+  updater   User     @relation(fields: [updaterId], references: [id])
+  updaterId String
+  newBid    Float?
+  newAsk    Float?
+  timestamp DateTime @default(now())
+} 
