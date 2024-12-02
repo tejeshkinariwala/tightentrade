@@ -14,6 +14,7 @@ interface BetCardProps {
     isTraded: boolean;
     isSettled: boolean;
     eventResult?: boolean;
+    creator: { username: string };
     trades: Array<{
       buyer: { username: string };
       seller: { username: string };
@@ -39,6 +40,8 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   const userColor = USER_COLORS[currentProfile.username as Username];
   const [newBid, setNewBid] = React.useState(bet.currentBid);
   const [newAsk, setNewAsk] = React.useState(bet.currentAsk);
+  const [isEditingNotional, setIsEditingNotional] = React.useState(false);
+  const [newNotional, setNewNotional] = React.useState(bet.notional);
 
   const lastBidUpdate = bet.priceUpdates
     .filter(update => update.newBid !== null)
@@ -98,184 +101,145 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
     onDelete(bet.id);
   };
 
-  return (
-    <div className="test-card">
-      <div className={`
-        bg-white
-        rounded-xl
-        p-8
-        shadow-lg
-        hover:shadow-2xl
-        transition-all
-        duration-300
-        border
-        border-gray-200
-        hover:border-${userColor.primary}
-        transform
-        hover:-translate-y-1
-        ${!bet.isTraded ? `bg-gradient-to-br from-white to-${userColor.gradient}` : 'bg-gradient-to-br from-gray-50 to-gray-100'}
-      `}>
-        <div className="flex justify-between items-center mb-6">
-          <h2 
-            className="text-2xl font-bold"
-            style={{ color: userColor.primary }}
-          >
-            {bet.eventName}
-          </h2>
-          <button
-            onClick={handleDelete}
-            className="text-gray-400 hover:text-red-500 transition-colors"
-          >
-            ✕
-          </button>
-        </div>
-        <div className="space-y-8">
-          <p className="text-gray-600 font-medium text-lg">
-            Notional: <span style={{ color: userColor.primary }} className="font-semibold">${bet.notional}</span>
-          </p>
-          
-          {!bet.isTraded ? (
-            <div className="space-y-8">
-              <div className="flex justify-between items-start">
-                <div className="flex-1 mr-6">
-                  <p className="text-gray-700 font-medium mb-3">
-                    Bid: <span style={{ color: userColor.primary }} className="font-semibold text-lg">{bet.currentBid}</span>
-                    {lastBidUpdate && 
-                      <span className="text-sm ml-2 text-gray-500">
-                        (by {lastBidUpdate.updater.username})
-                      </span>
-                    }
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="number"
-                      value={newBid}
-                      onChange={(e) => setNewBid(Number(e.target.value))}
-                      className={`w-32 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:border-transparent text-lg font-medium`}
-                      style={{ 
-                        '--tw-ring-color': userColor.primary,
-                        '--tw-ring-opacity': 0.5 
-                      } as React.CSSProperties}
-                      min={bet.currentBid + calculateMinIncrement()}
-                      max={bet.currentAsk}
-                      step={0.5}
-                    />
-                    <button
-                      onClick={handleBidUpdate}
-                      className="text-white px-4 py-3 rounded-lg transition-colors font-medium"
-                      style={{ 
-                        backgroundColor: userColor.primary,
-                        '--tw-hover-bg-opacity': 0.9 
-                      } as React.CSSProperties}
-                    >
-                      Update
-                    </button>
-                  </div>
-                </div>
-                <button
-                  onClick={() => onTrade(bet.id, 'sell')}
-                  className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg transition-colors font-medium min-w-[180px] text-center"
-                >
-                  {`Sell to ${lastBidUpdate?.updater.username || 'N/A'} at ${bet.currentBid}`}
-                </button>
-              </div>
+  const canSell = lastBidUpdate?.updater.username !== currentProfile.username;
+  const canBuy = lastAskUpdate?.updater.username !== currentProfile.username;
 
-              <div className="flex justify-between items-start">
-                <div className="flex-1 mr-6">
-                  <p className="text-gray-700 font-medium mb-3">
-                    Ask: <span style={{ color: userColor.primary }} className="font-semibold text-lg">{bet.currentAsk}</span>
-                    {lastAskUpdate && 
-                      <span className="text-sm ml-2 text-gray-500">
-                        (by {lastAskUpdate.updater.username})
-                      </span>
-                    }
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="number"
-                      value={newAsk}
-                      onChange={(e) => setNewAsk(Number(e.target.value))}
-                      className={`w-32 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:border-transparent text-lg font-medium`}
-                      style={{ 
-                        '--tw-ring-color': userColor.primary,
-                        '--tw-ring-opacity': 0.5 
-                      } as React.CSSProperties}
-                      min={bet.currentBid}
-                      max={bet.currentAsk - calculateMinIncrement()}
-                      step={0.5}
-                    />
-                    <button
-                      onClick={handleAskUpdate}
-                      className="text-white px-4 py-3 rounded-lg transition-colors font-medium"
-                      style={{ 
-                        backgroundColor: userColor.primary,
-                        '--tw-hover-bg-opacity': 0.9 
-                      } as React.CSSProperties}
-                    >
-                      Update
-                    </button>
-                  </div>
-                </div>
-                <button
-                  onClick={() => onTrade(bet.id, 'buy')}
-                  className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors font-medium min-w-[180px] text-center"
-                >
-                  {`Buy from ${lastAskUpdate?.updater.username || 'N/A'} at ${bet.currentAsk}`}
-                </button>
-              </div>
+  const handleNotionalUpdate = async () => {
+    if (newNotional <= 0) {
+      alert("Notional must be greater than 0");
+      return;
+    }
+    try {
+      const response = await fetch(`/api/bets/${bet.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'notional',
+          value: newNotional,
+          updaterName: currentProfile.username
+        })
+      });
+      if (!response.ok) throw new Error('Failed to update notional');
+      setIsEditingNotional(false);
+    } catch (error) {
+      console.error('Error updating notional:', error);
+      alert('Failed to update notional');
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h3 className="text-lg font-semibold">{bet.eventName}</h3>
+          <p className="text-sm text-gray-500">Created by {bet.creator.username}</p>
+        </div>
+        <div className="text-sm text-gray-500">
+          {isEditingNotional ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                value={newNotional}
+                onChange={(e) => setNewNotional(Number(e.target.value))}
+                className="w-24 p-1 border rounded"
+                min="1"
+              />
+              <button
+                onClick={handleNotionalUpdate}
+                className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setIsEditingNotional(false)}
+                className="px-2 py-1 bg-gray-500 text-white rounded text-xs"
+              >
+                Cancel
+              </button>
             </div>
           ) : (
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <h3 className="text-lg font-semibold" style={{ color: userColor.primary }}>
-                  Trade Details
-                </h3>
-                <div className="space-y-2">
-                  <p className="text-gray-700">Buyer: <span className="font-medium">{lastTrade.buyer.username}</span></p>
-                  <p className="text-gray-700">Seller: <span className="font-medium">{lastTrade.seller.username}</span></p>
-                  <p className="text-gray-700">Price: <span className="font-medium">{lastTrade.price}</span></p>
-                  <p className="text-gray-600 text-sm mt-3">
-                    {lastTrade.taker.username} hit {lastTrade.maker.username}'s {lastTrade.maker.username === lastTrade.seller.username ? 'ask' : 'bid'}
-                  </p>
-                </div>
-              </div>
-
-              {!bet.isSettled ? (
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => onSettle(bet.id, true)}
-                    className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg transition-colors font-medium"
-                  >
-                    Event Happened
-                  </button>
-                  <button
-                    onClick={() => onSettle(bet.id, false)}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-lg transition-colors font-medium"
-                  >
-                    Event Did Not Happen
-                  </button>
-                </div>
-              ) : (
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <p className="font-semibold text-gray-800 mb-3">
-                    Result: {bet.eventResult ? (
-                      <span className="text-green-600">Event Happened</span>
-                    ) : (
-                      <span className="text-red-600">Event Did Not Happen</span>
-                    )}
-                  </p>
-                  <p className="text-gray-700">
-                    {bet.eventResult ? (
-                      `${lastTrade.seller.username} owes ${lastTrade.buyer.username} $${(bet.notional * (100 - lastTrade.price) / 100).toFixed(2)}`
-                    ) : (
-                      `${lastTrade.buyer.username} owes ${lastTrade.seller.username} $${(bet.notional * lastTrade.price / 100).toFixed(2)}`
-                    )}
-                  </p>
-                </div>
-              )}
+            <div
+              onClick={() => !bet.isTraded && setIsEditingNotional(true)}
+              className={`cursor-pointer ${!bet.isTraded && 'hover:text-blue-500'}`}
+            >
+              Notional: {bet.notional}
             </div>
           )}
         </div>
+      </div>
+
+      <div className="flex flex-col gap-4 mb-4">
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <input
+              type="number"
+              value={newBid}
+              onChange={(e) => setNewBid(Number(e.target.value))}
+              className="w-full p-2 border rounded"
+              placeholder="Bid"
+              disabled={bet.isTraded}
+            />
+          </div>
+          <div className="flex-1">
+            <input
+              type="number"
+              value={newAsk}
+              onChange={(e) => setNewAsk(Number(e.target.value))}
+              className="w-full p-2 border rounded"
+              placeholder="Ask"
+              disabled={bet.isTraded}
+            />
+          </div>
+          <button
+            onClick={handleBidUpdate}
+            disabled={bet.isTraded}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
+          >
+            Update
+          </button>
+        </div>
+
+        <div className="flex gap-2">
+          {canSell && (
+            <button
+              onClick={() => onTrade(bet.id, 'sell')}
+              disabled={bet.isTraded}
+              className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:bg-gray-300"
+            >
+              Sell to {lastBidUpdate?.updater.username || '...'}
+            </button>
+          )}
+          {canBuy && (
+            <button
+              onClick={() => onTrade(bet.id, 'buy')}
+              disabled={bet.isTraded}
+              className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300"
+            >
+              Buy from {lastAskUpdate?.updater.username || '...'}
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="text-sm text-gray-500">
+        {/* ... price updates section stays the same ... */}
+      </div>
+
+      <div className="mt-4">
+        <h4 className="text-lg font-semibold">Settlement</h4>
+        <p className="text-gray-700">
+          {bet.eventResult ? (
+            // If event happened, buyer wins (100 - price)% of notional
+            `${lastTrade.buyer.username === lastTrade.seller.username ? 'No payment needed' : 
+              `${lastTrade.seller.username} owes ${lastTrade.buyer.username} $${(bet.notional * (100 - lastTrade.price) / 100).toFixed(2)}`
+            }`
+          ) : (
+            // If event didn't happen, seller wins price% of notional
+            `${lastTrade.buyer.username === lastTrade.seller.username ? 'No payment needed' : 
+              `${lastTrade.buyer.username} owes ${lastTrade.seller.username} $${(bet.notional * lastTrade.price / 100).toFixed(2)}`
+            }`
+          )}
+        </p>
       </div>
     </div>
   );

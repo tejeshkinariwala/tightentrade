@@ -17,7 +17,6 @@ export async function PATCH(
     const data = await request.json();
     const { type, value, updaterName } = data;
 
-    // First check if bet exists and is not traded
     const existingBet = await prisma.bet.findUnique({
       where: { id: params.id }
     });
@@ -26,6 +25,15 @@ export async function PATCH(
       return NextResponse.json({ error: 'Bet not found' }, { status: 404 });
     }
 
+    if (type === 'notional') {
+      const updatedBet = await prisma.bet.update({
+        where: { id: params.id },
+        data: { notional: value }
+      });
+      return NextResponse.json(updatedBet);
+    }
+
+    // First check if bet exists and is not traded
     if (existingBet.isTraded) {
       return NextResponse.json({ error: 'Cannot update traded bet' }, { status: 400 });
     }
