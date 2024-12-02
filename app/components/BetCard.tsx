@@ -29,7 +29,7 @@ interface BetCardProps {
       timestamp: string;
     }>;
   };
-  onUpdate: (betId: string, type: 'bid' | 'ask', value: number) => void;
+  onUpdate: (betId: string, type: 'bid' | 'ask' | 'notional', value: number) => void;
   onTrade: (betId: string, type: 'buy' | 'sell') => void;
   onSettle: (betId: string, result: boolean) => void;
   onDelete: (betId: string) => void;
@@ -120,6 +120,8 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
         })
       });
       if (!response.ok) throw new Error('Failed to update notional');
+      const updatedBet = await response.json();
+      onUpdate(bet.id, 'notional', newNotional);
       setIsEditingNotional(false);
     } catch (error) {
       console.error('Error updating notional:', error);
@@ -231,6 +233,30 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
       <div className="text-sm text-gray-500">
         {/* ... price updates section stays the same ... */}
       </div>
+
+      {/* Trade Details */}
+      {bet.isTraded && lastTrade && (
+        <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <h4 className="text-lg font-semibold mb-2">Trade Details</h4>
+          <div className="space-y-2 text-sm">
+            <p>
+              <span className="font-medium">Buyer:</span> {lastTrade.buyer.username}
+            </p>
+            <p>
+              <span className="font-medium">Seller:</span> {lastTrade.seller.username}
+            </p>
+            <p>
+              <span className="font-medium">Trade:</span> {lastTrade.taker.username} hit {lastTrade.maker.username}'s {lastTrade.buyer.username === lastTrade.taker.username ? 'ask' : 'bid'}
+            </p>
+            <p>
+              <span className="font-medium">Price:</span> {lastTrade.price}
+            </p>
+            <p>
+              <span className="font-medium">Notional:</span> ${bet.notional}
+            </p>
+          </div>
+        </div>
+      )}
 
       {bet.isTraded && !bet.isSettled && (
         <div className="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">

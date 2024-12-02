@@ -28,7 +28,26 @@ export async function PATCH(
     if (type === 'notional') {
       const updatedBet = await prisma.bet.update({
         where: { id: params.id },
-        data: { notional: value }
+        data: { notional: value },
+        include: {
+          creator: true,
+          trades: {
+            include: {
+              buyer: true,
+              seller: true,
+              maker: true,
+              taker: true,
+            },
+          },
+          priceUpdates: {
+            include: {
+              updater: true,
+            },
+            orderBy: {
+              timestamp: 'desc'
+            }
+          },
+        }
       });
       return NextResponse.json(updatedBet);
     }
