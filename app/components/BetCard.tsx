@@ -55,7 +55,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
 
   const calculateMinIncrement = () => {
     const spread = bet.currentAsk - bet.currentBid;
-    return Math.min(Math.max(0.5, spread * 0.2), 5);
+    return Math.min(Math.max(0.5, spread * 0.1), 5);
   };
 
   const handleBidUpdate = async () => {
