@@ -1,64 +1,8 @@
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
-}
-
-model User {
-  id           String        @id @default(cuid())
-  username     String        @unique
-  createdBets  Bet[]        @relation("Creator")
-  createdTrades Trade[]     @relation("Maker")
-  takenTrades   Trade[]     @relation("Taker")
-  boughtTrades  Trade[]     @relation("Buyer")
-  soldTrades    Trade[]     @relation("Seller")
-  priceUpdates PriceUpdate[]
-}
-
-model Bet {
-  id          String       @id @default(cuid())
-  eventName   String
-  notional    Int
-  currentBid  Int
-  currentAsk  Int
-  isTraded    Boolean     @default(false)
-  isSettled   Boolean     @default(false)
-  eventResult Boolean?
-  creator     User        @relation("Creator", fields: [creatorId], references: [id])
-  creatorId   String
-  trades      Trade[]
-  priceUpdates PriceUpdate[]
-  createdAt   DateTime    @default(now())
-}
-
-model Trade {
-  id        String   @id @default(cuid())
-  bet       Bet      @relation(fields: [betId], references: [id])
-  betId     String
-  buyer     User     @relation("Buyer", fields: [buyerId], references: [id])
-  buyerId   String
-  seller    User     @relation("Seller", fields: [sellerId], references: [id])
-  sellerId  String
-  maker     User     @relation("Maker", fields: [makerId], references: [id])
-  makerId   String
-  taker     User     @relation("Taker", fields: [takerId], references: [id])
-  takerId   String
-  price     Int
-  timestamp DateTime @default(now())
-}
-
-model PriceUpdate {
-  id        String   @id @default(cuid())
-  bet       Bet      @relation(fields: [betId], references: [id])
-  betId     String
-  updater   User     @relation(fields: [updaterId], references: [id])
-  updaterId String
-  newBid    Int?
-  newAsk    Int?
-  timestamp String
 } 
