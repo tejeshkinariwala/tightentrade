@@ -130,6 +130,29 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   const currentBid = lastBidUpdate?.newBid ?? bet.currentBid;
   const currentAsk = lastAskUpdate?.newAsk ?? bet.currentAsk;
 
+  const handleTradeConfirmation = (type: 'buy' | 'sell') => {
+    const tradeDetails = type === 'buy' 
+      ? {
+          action: 'buy from',
+          counterparty: lastAskUpdate?.updater.username,
+          price: currentAsk
+        }
+      : {
+          action: 'sell to',
+          counterparty: lastBidUpdate?.updater.username,
+          price: currentBid
+        };
+
+    const message = `Are you sure you want to ${tradeDetails.action} ${tradeDetails.counterparty}?\n\n` +
+      `Bet: ${bet.eventName}\n` +
+      `Price: ${tradeDetails.price}⚜️\n` +
+      `Notional: ${bet.notional}⚜️`;
+
+    if (window.confirm(message)) {
+      onTrade(bet.id, type);
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4">
       <div className="flex items-center justify-between mb-4">
@@ -231,7 +254,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
         <div className="flex gap-4">
           {canSell && (
             <button
-              onClick={() => onTrade(bet.id, 'sell')}
+              onClick={() => handleTradeConfirmation('sell')}
               disabled={bet.isTraded}
               className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 disabled:bg-gray-300"
             >
@@ -240,7 +263,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
           )}
           {canBuy && (
             <button
-              onClick={() => onTrade(bet.id, 'buy')}
+              onClick={() => handleTradeConfirmation('buy')}
               disabled={bet.isTraded}
               className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-300"
             >
