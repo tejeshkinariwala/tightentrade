@@ -40,6 +40,8 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   const userColor = USER_COLORS[currentProfile.username as Username];
   const [isEditingNotional, setIsEditingNotional] = React.useState(false);
   const [newNotional, setNewNotional] = React.useState(bet.notional);
+  const [bidValue, setBidValue] = React.useState('');
+  const [askValue, setAskValue] = React.useState('');
 
   const lastBidUpdate = bet.priceUpdates
     .filter(update => update.newBid !== null)
@@ -58,8 +60,6 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
 
   const handleBidUpdate = async () => {
     try {
-      const inputElement = document.getElementById('bid-input') as HTMLInputElement;
-      const bidValue = inputElement.value;
       console.log('Raw bid value:', bidValue); // Debug log
 
       // Validate input
@@ -134,8 +134,6 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
 
   const handleAskUpdate = async () => {
     try {
-      const inputElement = document.getElementById('ask-input') as HTMLInputElement;
-      const askValue = inputElement.value;
       console.log('Raw ask value:', askValue); // Debug log
 
       // Validate input
@@ -342,6 +340,8 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
             <input
               id="bid-input"
               type="number"
+              value={bidValue}
+              onChange={(e) => setBidValue(e.target.value)}
               placeholder="New Bid"
               className="w-20 p-2 border rounded"
               disabled={bet.isTraded}
@@ -358,6 +358,8 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
             <input
               id="ask-input"
               type="number"
+              value={askValue}
+              onChange={(e) => setAskValue(e.target.value)}
               placeholder="New Ask"
               className="w-20 p-2 border rounded"
               disabled={bet.isTraded}
