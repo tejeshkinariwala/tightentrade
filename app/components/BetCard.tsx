@@ -136,37 +136,46 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
           <h3 className="text-lg font-semibold">{bet.eventName}</h3>
           <p className="text-sm text-gray-500">Created by {bet.creator.username}</p>
         </div>
-        <div className="text-sm text-gray-500">
-          {isEditingNotional ? (
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                value={newNotional}
-                onChange={(e) => setNewNotional(Number(e.target.value))}
-                className="w-24 p-1 border rounded"
-                min="1"
-              />
-              <button
-                onClick={handleNotionalUpdate}
-                className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-gray-500">
+            {isEditingNotional ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  value={newNotional}
+                  onChange={(e) => setNewNotional(Number(e.target.value))}
+                  className="w-24 p-1 border rounded"
+                  min="1"
+                />
+                <button
+                  onClick={handleNotionalUpdate}
+                  className="px-2 py-1 bg-blue-500 text-white rounded text-xs"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => setIsEditingNotional(false)}
+                  className="px-2 py-1 bg-gray-500 text-white rounded text-xs"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <div
+                onClick={() => !bet.isTraded && setIsEditingNotional(true)}
+                className={`cursor-pointer ${!bet.isTraded && 'hover:text-blue-500'}`}
               >
-                Save
-              </button>
-              <button
-                onClick={() => setIsEditingNotional(false)}
-                className="px-2 py-1 bg-gray-500 text-white rounded text-xs"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <div
-              onClick={() => !bet.isTraded && setIsEditingNotional(true)}
-              className={`cursor-pointer ${!bet.isTraded && 'hover:text-blue-500'}`}
-            >
-              Notional: {bet.notional}
-            </div>
-          )}
+                Notional: {bet.notional}
+              </div>
+            )}
+          </div>
+          <button
+            onClick={handleDelete}
+            className="text-red-500 hover:text-red-700"
+            title="Delete bet"
+          >
+            🗑️
+          </button>
         </div>
       </div>
 
@@ -282,6 +291,9 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
       {bet.isTraded && bet.isSettled && lastTrade && (
         <div className="mt-4">
           <h4 className="text-lg font-semibold">Settlement</h4>
+          <p className="text-gray-600 mb-2">
+            {bet.eventName} - {bet.eventResult ? '✅ YES' : '❌ NO'}
+          </p>
           <p className="text-gray-700">
             {bet.eventResult ? (
               `${lastTrade.seller.username} owes ${lastTrade.buyer.username} $${(bet.notional * (100 - lastTrade.price) / 100).toFixed(2)}`
