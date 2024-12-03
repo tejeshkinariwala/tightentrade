@@ -58,6 +58,15 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
 
   const handleBidUpdate = async () => {
     try {
+      const inputElement = document.getElementById('bid-input') as HTMLInputElement;
+      const newBid = Number(inputElement.value);
+
+      // Validate input
+      if (!inputElement.value || isNaN(newBid)) {
+        alert("Please enter a valid bid price");
+        return;
+      }
+
       // First refresh to get latest state
       const response = await fetch('/api/bets');
       const bets = await response.json();
@@ -87,8 +96,6 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
       const currentLatestBid = latestBidUpdate?.newBid ?? latestBet.currentBid;
       const currentLatestAsk = latestAskUpdate?.newAsk ?? latestBet.currentAsk;
       
-      const newBid = Number((document.getElementById('bid-input') as HTMLInputElement).value);
-      
       if (newBid <= currentLatestBid) {
         alert(`New bid (${newBid}) must be higher than current bid (${currentLatestBid})`);
         window.location.reload(); // Refresh to show latest state
@@ -110,6 +117,15 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
 
   const handleAskUpdate = async () => {
     try {
+      const inputElement = document.getElementById('ask-input') as HTMLInputElement;
+      const newAsk = Number(inputElement.value);
+
+      // Validate input
+      if (!inputElement.value || isNaN(newAsk)) {
+        alert("Please enter a valid ask price");
+        return;
+      }
+
       // First refresh to get latest state
       const response = await fetch('/api/bets');
       const bets = await response.json();
@@ -138,8 +154,6 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
 
       const currentLatestBid = latestBidUpdate?.newBid ?? latestBet.currentBid;
       const currentLatestAsk = latestAskUpdate?.newAsk ?? latestBet.currentAsk;
-      
-      const newAsk = Number((document.getElementById('ask-input') as HTMLInputElement).value);
       
       if (newAsk >= currentLatestAsk) {
         alert(`New ask (${newAsk}) must be lower than current ask (${currentLatestAsk})`);
