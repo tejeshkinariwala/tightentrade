@@ -58,14 +58,13 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
 
   const handleBidUpdate = () => {
     const minIncrement = calculateMinIncrement();
-    const minValidBid = bet.currentBid + minIncrement;
     const newBid = Number((document.getElementById('bid-input') as HTMLInputElement).value);
     
-    if (newBid < minValidBid) {
-      alert(`New bid must be at least ${minIncrement} above current bid (${minValidBid})`);
+    if (newBid <= currentBid) {
+      alert("New bid must be higher than current bid");
       return;
     }
-    if (newBid >= bet.currentAsk) {
+    if (newBid >= currentAsk) {
       alert("New bid must be lower than current ask");
       return;
     }
@@ -76,6 +75,10 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
     const minIncrement = calculateMinIncrement();
     const newAsk = Number((document.getElementById('ask-input') as HTMLInputElement).value);
     
+    if (newAsk >= currentAsk) {
+      alert("New ask must be lower than current ask");
+      return;
+    }
     if (newAsk <= currentBid) {
       alert("New ask must be higher than current bid");
       return;

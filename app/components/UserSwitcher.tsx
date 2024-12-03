@@ -61,6 +61,7 @@ interface UserSwitcherProps {
   bets: Array<{
     id: string;
     isSettled: boolean;
+    isTraded: boolean;
     eventResult?: boolean;
     notional: number;
     trades: Array<{
@@ -108,6 +109,25 @@ export default function UserSwitcher({ bets }: UserSwitcherProps) {
 
   const winnings = calculateUserWinnings(currentProfile.username, settledTrades);
   console.log('Calculated winnings:', winnings);
+
+  const calculateBalance = (username: string) => {
+    let balance = 0;
+    bets.forEach(bet => {
+      if (!bet.isTraded || !bet.isSettled) return;
+      const trade = bet.trades[bet.trades.length - 1];
+      if (trade.buyer.username === username) {
+        balance += bet.eventResult ? 
+          (bet.notional * (100 - trade.price) / 100) : 
+          -(bet.notional * trade.price / 100);
+      }
+      if (trade.seller.username === username) {
+        balance += bet.eventResult ? 
+          -(bet.notional * (100 - trade.price) / 100) : 
+          (bet.notional * trade.price / 100);
+      }
+    });
+    return `${balance.toFixed(2)}⚜️`;
+  };
 
   return (
     <div className="flex flex-col items-center gap-4">
