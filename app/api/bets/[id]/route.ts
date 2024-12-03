@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '../../../lib/prisma'
 import type { PrismaClient } from '.prisma/client'
+import { notifyClients } from '../../../lib/notify'
 
 type TransactionClient = Omit<
   PrismaClient,
@@ -106,6 +107,7 @@ export async function PATCH(
       });
     });
 
+    await notifyClients();
     return NextResponse.json(updatedBet);
   } catch (error) {
     console.error('PATCH Error:', error);
