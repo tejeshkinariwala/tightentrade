@@ -194,7 +194,7 @@ export default function Home() {
             className="text-4xl font-bold text-center"
             style={{ color: userColor.primary }}
           >
-            Betting Platform
+            Buccaneer's Bazaar ⚔️
           </h1>
           <UserSwitcher bets={bets} />
           <button

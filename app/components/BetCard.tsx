@@ -74,14 +74,9 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
 
   const handleAskUpdate = () => {
     const minIncrement = calculateMinIncrement();
-    const maxValidAsk = bet.currentAsk - minIncrement;
     const newAsk = Number((document.getElementById('ask-input') as HTMLInputElement).value);
     
-    if (newAsk > maxValidAsk) {
-      alert(`New ask must be at least ${minIncrement} below current ask (${maxValidAsk})`);
-      return;
-    }
-    if (newAsk <= bet.currentBid) {
+    if (newAsk <= currentBid) {
       alert("New ask must be higher than current bid");
       return;
     }
@@ -129,6 +124,9 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
     }
   };
 
+  const currentBid = lastBidUpdate?.newBid ?? bet.currentBid;
+  const currentAsk = lastAskUpdate?.newAsk ?? bet.currentAsk;
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4">
       <div className="flex items-center justify-between mb-4">
@@ -165,7 +163,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
                 onClick={() => !bet.isTraded && setIsEditingNotional(true)}
                 className={`cursor-pointer ${!bet.isTraded && 'hover:text-blue-500'}`}
               >
-                Notional: 🏴‍☠️ {bet.notional} doubloons
+                {bet.notional}⚜️
               </div>
             )}
           </div>
@@ -185,7 +183,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
             <input
               id="bid-input"
               type="number"
-              defaultValue={bet.currentBid}
+              defaultValue={currentBid}
               className="w-20 p-2 border rounded"
               placeholder="Bid"
               disabled={bet.isTraded}
@@ -202,7 +200,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
             <input
               id="ask-input"
               type="number"
-              defaultValue={bet.currentAsk}
+              defaultValue={currentAsk}
               className="w-20 p-2 border rounded"
               placeholder="Ask"
               disabled={bet.isTraded}
@@ -261,7 +259,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
               <span className="font-medium">Price:</span> {lastTrade.price}
             </p>
             <p>
-              <span className="font-medium">Notional:</span> 🏴‍☠️ {bet.notional} doubloons
+              <span className="font-medium">Notional:</span> {bet.notional}⚜️
             </p>
           </div>
         </div>
@@ -296,9 +294,9 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
           </p>
           <p className="text-gray-700">
             {bet.eventResult ? (
-              `${lastTrade.seller.username} owes ${lastTrade.buyer.username} 🏴‍☠️ ${(bet.notional * (100 - lastTrade.price) / 100).toFixed(2)} doubloons`
+              `${lastTrade.seller.username} owes ${lastTrade.buyer.username} ${(bet.notional * (100 - lastTrade.price) / 100).toFixed(2)}⚜️`
             ) : (
-              `${lastTrade.buyer.username} owes ${lastTrade.seller.username} 🏴‍☠️ ${(bet.notional * lastTrade.price / 100).toFixed(2)} doubloons`
+              `${lastTrade.buyer.username} owes ${lastTrade.seller.username} ${(bet.notional * lastTrade.price / 100).toFixed(2)}⚜️`
             )}
           </p>
         </div>
