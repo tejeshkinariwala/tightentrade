@@ -2,9 +2,12 @@ import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
+let clients = new Set<ReadableStreamController>();
+
 export async function GET() {
   const stream = new ReadableStream({
     start(controller) {
+      clients.add(controller);
       const encoder = new TextEncoder();
 
       // Send initial connection message
@@ -18,6 +21,7 @@ export async function GET() {
       // Clean up on close
       return () => {
         clearInterval(keepAlive);
+        clients.delete(controller);
       };
     },
   });
@@ -29,4 +33,13 @@ export async function GET() {
       'Connection': 'keep-alive',
     },
   });
+}
+
+export async function POST() {
+  const encoder = new TextEncoder();
+  clients.forEach(client => {
+    client.enqueue(encoder.encode('event: refresh\ndata: {}\n\n'));
+  });
+  
+  return NextResponse.json({ success: true });
 } 

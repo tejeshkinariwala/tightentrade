@@ -94,6 +94,8 @@ export async function POST(
       ${trade.buyer.username} bought from ${trade.seller.username} at ${trade.price}
       (${trade.taker.username} hit ${trade.maker.username}'s ${type === 'buy' ? 'ask' : 'bid'})`
 
+    await notifyClients()
+
     return NextResponse.json({ 
       trade: {
         ...trade,

@@ -1,6 +1,10 @@
+const BASE_URL = process.env.VERCEL_URL ? 
+  `https://${process.env.VERCEL_URL}` : 
+  'http://localhost:3000';
+
 export async function notifyClients() {
   try {
-    const response = await fetch('/api/events', {
+    const response = await fetch(`${BASE_URL}/api/events`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
