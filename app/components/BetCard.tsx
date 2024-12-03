@@ -181,11 +181,19 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
       </div>
 
       <div className="flex flex-col gap-4 mb-4">
-        <div className="flex gap-2">
+        {/* Current Prices Row */}
+        <div className="flex justify-between px-2">
+          <div className="text-sm text-gray-600">
+            Current Bid: {currentBid}⚜️ ({lastBidUpdate?.updater.username || 'None'})
+          </div>
+          <div className="text-sm text-gray-600">
+            Current Ask: {currentAsk}⚜️ ({lastAskUpdate?.updater.username || 'None'})
+          </div>
+        </div>
+
+        {/* Input Fields Row */}
+        <div className="flex gap-4">
           <div className="flex-1 flex gap-2">
-            <div className="text-sm text-gray-600 mb-1">
-              Current Bid: {currentBid}⚜️ ({lastBidUpdate?.updater.username || 'None'})
-            </div>
             <input
               id="bid-input"
               type="number"
@@ -202,9 +210,6 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
             </button>
           </div>
           <div className="flex-1 flex gap-2">
-            <div className="text-sm text-gray-600 mb-1">
-              Current Ask: {currentAsk}⚜️ ({lastAskUpdate?.updater.username || 'None'})
-            </div>
             <input
               id="ask-input"
               type="number"
@@ -222,7 +227,8 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
           </div>
         </div>
 
-        <div className="flex gap-2">
+        {/* Trade Buttons Row */}
+        <div className="flex gap-4">
           {canSell && (
             <button
               onClick={() => onTrade(bet.id, 'sell')}
