@@ -14,7 +14,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <UserProvider>
-            <EventProvider onRefresh={() => window.location.reload()}>
+            <EventProvider>
               {children}
             </EventProvider>
           </UserProvider>

@@ -1,1 +1,15 @@
-{"projectId":"prj_lHgugmVK2JmEff0fyDEpj2PGs6m1","orgId":"team_OmUwuksVamGPsOlzYF1qzWTt"}
+{
+  "projectId": "prj_lHgugmVK2JmEff0fyDEpj2PGs6m1",
+  "orgId": "team_OmUwuksVamGPsOlzYF1qzWTt",
+  "settings": {
+    "createdAt": 1733104450041,
+    "framework": "nextjs",
+    "devCommand": null,
+    "installCommand": "npm install",
+    "buildCommand": "npm run build",
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "22.x"
+  }
+}

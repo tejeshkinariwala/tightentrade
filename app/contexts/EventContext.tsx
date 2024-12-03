@@ -8,19 +8,17 @@ interface EventContextType {
 
 const EventContext = createContext<EventContextType>({ refreshData: () => {} });
 
-export function EventProvider({ 
-  children,
-  onRefresh 
-}: { 
-  children: React.ReactNode;
-  onRefresh: () => void;
-}) {
+export function EventProvider({ children }: { children: React.ReactNode }) {
+  const refresh = () => {
+    window.location.reload();
+  };
+
   useEffect(() => {
     const eventSource = new EventSource('/api/events');
 
     eventSource.onmessage = (event) => {
       console.log('Received event:', event.data);
-      onRefresh();
+      refresh();
     };
 
     eventSource.onerror = (error) => {
@@ -31,10 +29,10 @@ export function EventProvider({
     return () => {
       eventSource.close();
     };
-  }, [onRefresh]);
+  }, []);
 
   return (
-    <EventContext.Provider value={{ refreshData: onRefresh }}>
+    <EventContext.Provider value={{ refreshData: refresh }}>
       {children}
     </EventContext.Provider>
   );
