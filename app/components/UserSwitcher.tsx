@@ -142,7 +142,7 @@ export default function UserSwitcher({ bets }: UserSwitcherProps) {
           </span>
         </span>
         <span className={`text-lg font-semibold mt-1 ${winnings >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-          {winnings >= 0 ? '+' : ''}{winnings.toFixed(2)}$
+          {winnings >= 0 ? '+' : ''}{winnings.toFixed(2)}⚜️
         </span>
       </div>
       <div className="flex items-center gap-8">

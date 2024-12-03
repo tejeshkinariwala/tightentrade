@@ -183,12 +183,14 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
       <div className="flex flex-col gap-4 mb-4">
         <div className="flex gap-2">
           <div className="flex-1 flex gap-2">
+            <div className="text-sm text-gray-600 mb-1">
+              Current Bid: {currentBid}⚜️ ({lastBidUpdate?.updater.username || 'None'})
+            </div>
             <input
               id="bid-input"
               type="number"
-              defaultValue={currentBid}
+              placeholder="New Bid"
               className="w-20 p-2 border rounded"
-              placeholder="Bid"
               disabled={bet.isTraded}
             />
             <button
@@ -200,12 +202,14 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
             </button>
           </div>
           <div className="flex-1 flex gap-2">
+            <div className="text-sm text-gray-600 mb-1">
+              Current Ask: {currentAsk}⚜️ ({lastAskUpdate?.updater.username || 'None'})
+            </div>
             <input
               id="ask-input"
               type="number"
-              defaultValue={currentAsk}
+              placeholder="New Ask"
               className="w-20 p-2 border rounded"
-              placeholder="Ask"
               disabled={bet.isTraded}
             />
             <button
