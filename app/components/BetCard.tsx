@@ -59,21 +59,23 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   const handleBidUpdate = async () => {
     try {
       const inputElement = document.getElementById('bid-input') as HTMLInputElement;
-      const inputValue = inputElement.value.trim();
-      console.log('Input value:', inputValue); // Debug log
-      
-      // Check if input is empty
-      if (!inputValue) {
-        alert("Please enter a bid price");
+      if (!inputElement) {
+        console.error('Bid input element not found');
+        alert("Something went wrong. Please try again.");
         return;
       }
 
-      const newBid = parseFloat(inputValue);
-      console.log('Parsed bid:', newBid); // Debug log
-
-      // Check if input is a valid number
-      if (isNaN(newBid) || newBid <= 0) {
-        alert("Please enter a valid positive number");
+      // Force a parse of the input value
+      let newBid: number;
+      try {
+        newBid = Number(inputElement.value);
+        if (!Number.isFinite(newBid)) {
+          alert("Please enter a valid bid price");
+          return;
+        }
+      } catch (e) {
+        console.error('Error parsing bid value:', e);
+        alert("Please enter a valid number");
         return;
       }
 
@@ -117,6 +119,14 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
         return;
       }
       
+      const minIncrement = calculateMinIncrement();
+
+      // Add minimum increment validation
+      if (newBid - currentBid < minIncrement) {
+        alert(`New bid must be at least ${minIncrement} above current bid (minimum: ${(currentBid + minIncrement).toFixed(1)})`);
+        return;
+      }
+
       onUpdate(bet.id, 'bid', newBid);
     } catch (error) {
       console.error('Error checking latest state:', error);
@@ -128,21 +138,23 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   const handleAskUpdate = async () => {
     try {
       const inputElement = document.getElementById('ask-input') as HTMLInputElement;
-      const inputValue = inputElement.value.trim();
-      console.log('Input value:', inputValue); // Debug log
-      
-      // Check if input is empty
-      if (!inputValue) {
-        alert("Please enter an ask price");
+      if (!inputElement) {
+        console.error('Ask input element not found');
+        alert("Something went wrong. Please try again.");
         return;
       }
 
-      const newAsk = parseFloat(inputValue);
-      console.log('Parsed ask:', newAsk); // Debug log
-
-      // Check if input is a valid number
-      if (isNaN(newAsk) || newAsk <= 0) {
-        alert("Please enter a valid positive number");
+      // Force a parse of the input value
+      let newAsk: number;
+      try {
+        newAsk = Number(inputElement.value);
+        if (!Number.isFinite(newAsk)) {
+          alert("Please enter a valid ask price");
+          return;
+        }
+      } catch (e) {
+        console.error('Error parsing ask value:', e);
+        alert("Please enter a valid number");
         return;
       }
 
@@ -186,6 +198,14 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
         return;
       }
       
+      const minIncrement = calculateMinIncrement();
+
+      // Add minimum increment validation
+      if (currentAsk - newAsk < minIncrement) {
+        alert(`New ask must be at least ${minIncrement} below current ask (maximum: ${(currentAsk - minIncrement).toFixed(1)})`);
+        return;
+      }
+
       onUpdate(bet.id, 'ask', newAsk);
     } catch (error) {
       console.error('Error checking latest state:', error);
