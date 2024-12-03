@@ -59,11 +59,21 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   const handleBidUpdate = async () => {
     try {
       const inputElement = document.getElementById('bid-input') as HTMLInputElement;
-      const newBid = Number(inputElement.value);
+      const inputValue = inputElement.value.trim();
+      console.log('Input value:', inputValue); // Debug log
+      
+      // Check if input is empty
+      if (!inputValue) {
+        alert("Please enter a bid price");
+        return;
+      }
 
-      // Validate input
-      if (!inputElement.value || isNaN(newBid)) {
-        alert("Please enter a valid bid price");
+      const newBid = parseFloat(inputValue);
+      console.log('Parsed bid:', newBid); // Debug log
+
+      // Check if input is a valid number
+      if (isNaN(newBid) || newBid <= 0) {
+        alert("Please enter a valid positive number");
         return;
       }
 
@@ -118,11 +128,21 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   const handleAskUpdate = async () => {
     try {
       const inputElement = document.getElementById('ask-input') as HTMLInputElement;
-      const newAsk = Number(inputElement.value);
+      const inputValue = inputElement.value.trim();
+      console.log('Input value:', inputValue); // Debug log
+      
+      // Check if input is empty
+      if (!inputValue) {
+        alert("Please enter an ask price");
+        return;
+      }
 
-      // Validate input
-      if (!inputElement.value || isNaN(newAsk)) {
-        alert("Please enter a valid ask price");
+      const newAsk = parseFloat(inputValue);
+      console.log('Parsed ask:', newAsk); // Debug log
+
+      // Check if input is a valid number
+      if (isNaN(newAsk) || newAsk <= 0) {
+        alert("Please enter a valid positive number");
         return;
       }
 
