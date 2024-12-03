@@ -38,8 +38,6 @@ interface BetCardProps {
 export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: BetCardProps) {
   const { currentProfile } = useUser();
   const userColor = USER_COLORS[currentProfile.username as Username];
-  const [newBid, setNewBid] = React.useState(bet.currentBid);
-  const [newAsk, setNewAsk] = React.useState(bet.currentAsk);
   const [isEditingNotional, setIsEditingNotional] = React.useState(false);
   const [newNotional, setNewNotional] = React.useState(bet.notional);
 
@@ -61,6 +59,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   const handleBidUpdate = () => {
     const minIncrement = calculateMinIncrement();
     const minValidBid = bet.currentBid + minIncrement;
+    const newBid = Number((document.getElementById('bid-input') as HTMLInputElement).value);
     
     if (newBid < minValidBid) {
       alert(`New bid must be at least ${minIncrement} above current bid (${minValidBid})`);
@@ -76,6 +75,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   const handleAskUpdate = () => {
     const minIncrement = calculateMinIncrement();
     const maxValidAsk = bet.currentAsk - minIncrement;
+    const newAsk = Number((document.getElementById('ask-input') as HTMLInputElement).value);
     
     if (newAsk > maxValidAsk) {
       alert(`New ask must be at least ${minIncrement} below current ask (${maxValidAsk})`);
@@ -165,7 +165,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
                 onClick={() => !bet.isTraded && setIsEditingNotional(true)}
                 className={`cursor-pointer ${!bet.isTraded && 'hover:text-blue-500'}`}
               >
-                Notional: {bet.notional}
+                Notional: 🏴‍☠️ {bet.notional} doubloons
               </div>
             )}
           </div>
@@ -183,9 +183,9 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
         <div className="flex gap-2">
           <div className="flex-1 flex gap-2">
             <input
+              id="bid-input"
               type="number"
-              value={newBid}
-              onChange={(e) => setNewBid(Number(e.target.value))}
+              defaultValue={bet.currentBid}
               className="w-20 p-2 border rounded"
               placeholder="Bid"
               disabled={bet.isTraded}
@@ -200,9 +200,9 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
           </div>
           <div className="flex-1 flex gap-2">
             <input
+              id="ask-input"
               type="number"
-              value={newAsk}
-              onChange={(e) => setNewAsk(Number(e.target.value))}
+              defaultValue={bet.currentAsk}
               className="w-20 p-2 border rounded"
               placeholder="Ask"
               disabled={bet.isTraded}
@@ -261,7 +261,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
               <span className="font-medium">Price:</span> {lastTrade.price}
             </p>
             <p>
-              <span className="font-medium">Notional:</span> ${bet.notional}
+              <span className="font-medium">Notional:</span> 🏴‍☠️ {bet.notional} doubloons
             </p>
           </div>
         </div>
@@ -296,9 +296,9 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
           </p>
           <p className="text-gray-700">
             {bet.eventResult ? (
-              `${lastTrade.seller.username} owes ${lastTrade.buyer.username} $${(bet.notional * (100 - lastTrade.price) / 100).toFixed(2)}`
+              `${lastTrade.seller.username} owes ${lastTrade.buyer.username} 🏴‍☠️ ${(bet.notional * (100 - lastTrade.price) / 100).toFixed(2)} doubloons`
             ) : (
-              `${lastTrade.buyer.username} owes ${lastTrade.seller.username} $${(bet.notional * lastTrade.price / 100).toFixed(2)}`
+              `${lastTrade.buyer.username} owes ${lastTrade.seller.username} 🏴‍☠️ ${(bet.notional * lastTrade.price / 100).toFixed(2)} doubloons`
             )}
           </p>
         </div>
