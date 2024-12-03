@@ -57,75 +57,89 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   };
 
   const handleBidUpdate = async () => {
-    // First refresh to get latest state
-    const response = await fetch('/api/bets');
-    const bets = await response.json();
-    const latestBet = bets.find((b: any) => b.id === bet.id);
-    
-    if (!latestBet) {
-      alert("Bet not found. Please refresh the page.");
-      return;
-    }
+    try {
+      // First refresh to get latest state
+      const response = await fetch('/api/bets');
+      const bets = await response.json();
+      const latestBet = bets.find((b: any) => b.id === bet.id);
+      
+      if (!latestBet) {
+        alert("Bet not found. Please refresh the page.");
+        return;
+      }
 
-    const latestBidUpdate = latestBet.priceUpdates
-      .filter((update: any) => update.newBid !== null)
-      .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+      const latestBidUpdate = latestBet.priceUpdates
+        .filter((update: any) => update.newBid !== null)
+        .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
 
-    const latestAskUpdate = latestBet.priceUpdates
-      .filter((update: any) => update.newAsk !== null)
-      .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+      const latestAskUpdate = latestBet.priceUpdates
+        .filter((update: any) => update.newAsk !== null)
+        .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
 
-    const currentLatestBid = latestBidUpdate?.newBid ?? latestBet.currentBid;
-    const currentLatestAsk = latestAskUpdate?.newAsk ?? latestBet.currentAsk;
-    
-    const newBid = Number((document.getElementById('bid-input') as HTMLInputElement).value);
-    
-    if (newBid <= currentLatestBid) {
-      alert(`New bid (${newBid}) must be higher than current bid (${currentLatestBid})`);
-      return;
+      const currentLatestBid = latestBidUpdate?.newBid ?? latestBet.currentBid;
+      const currentLatestAsk = latestAskUpdate?.newAsk ?? latestBet.currentAsk;
+      
+      const newBid = Number((document.getElementById('bid-input') as HTMLInputElement).value);
+      
+      if (newBid <= currentLatestBid) {
+        alert(`New bid (${newBid}) must be higher than current bid (${currentLatestBid})`);
+        window.location.reload(); // Refresh to show latest state
+        return;
+      }
+      if (newBid >= currentLatestAsk) {
+        alert(`New bid (${newBid}) must be lower than current ask (${currentLatestAsk})`);
+        window.location.reload(); // Refresh to show latest state
+        return;
+      }
+      
+      onUpdate(bet.id, 'bid', newBid);
+    } catch (error) {
+      console.error('Error checking latest state:', error);
+      alert('Failed to check latest state. Please try again.');
     }
-    if (newBid >= currentLatestAsk) {
-      alert(`New bid (${newBid}) must be lower than current ask (${currentLatestAsk})`);
-      return;
-    }
-    
-    onUpdate(bet.id, 'bid', newBid);
   };
 
   const handleAskUpdate = async () => {
-    // First refresh to get latest state
-    const response = await fetch('/api/bets');
-    const bets = await response.json();
-    const latestBet = bets.find((b: any) => b.id === bet.id);
-    
-    if (!latestBet) {
-      alert("Bet not found. Please refresh the page.");
-      return;
-    }
+    try {
+      // First refresh to get latest state
+      const response = await fetch('/api/bets');
+      const bets = await response.json();
+      const latestBet = bets.find((b: any) => b.id === bet.id);
+      
+      if (!latestBet) {
+        alert("Bet not found. Please refresh the page.");
+        return;
+      }
 
-    const latestBidUpdate = latestBet.priceUpdates
-      .filter((update: any) => update.newBid !== null)
-      .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+      const latestBidUpdate = latestBet.priceUpdates
+        .filter((update: any) => update.newBid !== null)
+        .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
 
-    const latestAskUpdate = latestBet.priceUpdates
-      .filter((update: any) => update.newAsk !== null)
-      .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+      const latestAskUpdate = latestBet.priceUpdates
+        .filter((update: any) => update.newAsk !== null)
+        .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
 
-    const currentLatestBid = latestBidUpdate?.newBid ?? latestBet.currentBid;
-    const currentLatestAsk = latestAskUpdate?.newAsk ?? latestBet.currentAsk;
-    
-    const newAsk = Number((document.getElementById('ask-input') as HTMLInputElement).value);
-    
-    if (newAsk >= currentLatestAsk) {
-      alert(`New ask (${newAsk}) must be lower than current ask (${currentLatestAsk})`);
-      return;
+      const currentLatestBid = latestBidUpdate?.newBid ?? latestBet.currentBid;
+      const currentLatestAsk = latestAskUpdate?.newAsk ?? latestBet.currentAsk;
+      
+      const newAsk = Number((document.getElementById('ask-input') as HTMLInputElement).value);
+      
+      if (newAsk >= currentLatestAsk) {
+        alert(`New ask (${newAsk}) must be lower than current ask (${currentLatestAsk})`);
+        window.location.reload(); // Refresh to show latest state
+        return;
+      }
+      if (newAsk <= currentLatestBid) {
+        alert(`New ask (${newAsk}) must be higher than current bid (${currentLatestBid})`);
+        window.location.reload(); // Refresh to show latest state
+        return;
+      }
+      
+      onUpdate(bet.id, 'ask', newAsk);
+    } catch (error) {
+      console.error('Error checking latest state:', error);
+      alert('Failed to check latest state. Please try again.');
     }
-    if (newAsk <= currentLatestBid) {
-      alert(`New ask (${newAsk}) must be higher than current bid (${currentLatestBid})`);
-      return;
-    }
-    
-    onUpdate(bet.id, 'ask', newAsk);
   };
 
   const handleDelete = () => {
