@@ -59,23 +59,20 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   const handleBidUpdate = async () => {
     try {
       const inputElement = document.getElementById('bid-input') as HTMLInputElement;
-      if (!inputElement) {
-        console.error('Bid input element not found');
-        alert("Something went wrong. Please try again.");
+      const bidValue = inputElement.value;
+      console.log('Raw bid value:', bidValue); // Debug log
+
+      // Validate input
+      if (!bidValue || bidValue.trim() === '') {
+        alert("Please enter a bid price");
         return;
       }
 
-      // Force a parse of the input value
-      let newBid: number;
-      try {
-        newBid = Number(inputElement.value);
-        if (!Number.isFinite(newBid)) {
-          alert("Please enter a valid bid price");
-          return;
-        }
-      } catch (e) {
-        console.error('Error parsing bid value:', e);
-        alert("Please enter a valid number");
+      const newBid = parseFloat(bidValue);
+      console.log('Parsed bid:', newBid); // Debug log
+
+      if (isNaN(newBid) || newBid <= 0) {
+        alert("Please enter a valid positive number");
         return;
       }
 
@@ -138,23 +135,20 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
   const handleAskUpdate = async () => {
     try {
       const inputElement = document.getElementById('ask-input') as HTMLInputElement;
-      if (!inputElement) {
-        console.error('Ask input element not found');
-        alert("Something went wrong. Please try again.");
+      const askValue = inputElement.value;
+      console.log('Raw ask value:', askValue); // Debug log
+
+      // Validate input
+      if (!askValue || askValue.trim() === '') {
+        alert("Please enter an ask price");
         return;
       }
 
-      // Force a parse of the input value
-      let newAsk: number;
-      try {
-        newAsk = Number(inputElement.value);
-        if (!Number.isFinite(newAsk)) {
-          alert("Please enter a valid ask price");
-          return;
-        }
-      } catch (e) {
-        console.error('Error parsing ask value:', e);
-        alert("Please enter a valid number");
+      const newAsk = parseFloat(askValue);
+      console.log('Parsed ask:', newAsk); // Debug log
+
+      if (isNaN(newAsk) || newAsk <= 0) {
+        alert("Please enter a valid positive number");
         return;
       }
 
