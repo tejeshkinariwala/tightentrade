@@ -65,6 +65,14 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
       
       if (!latestBet) {
         alert("Bet not found. Please refresh the page.");
+        window.location.reload();
+        return;
+      }
+
+      // Check if bet is already traded
+      if (latestBet.isTraded) {
+        alert("Cannot update bid on traded bet");
+        window.location.reload();
         return;
       }
 
@@ -96,6 +104,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
     } catch (error) {
       console.error('Error checking latest state:', error);
       alert('Failed to check latest state. Please try again.');
+      window.location.reload();
     }
   };
 
@@ -108,6 +117,14 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
       
       if (!latestBet) {
         alert("Bet not found. Please refresh the page.");
+        window.location.reload();
+        return;
+      }
+
+      // Check if bet is already traded
+      if (latestBet.isTraded) {
+        alert("Cannot update ask on traded bet");
+        window.location.reload();
         return;
       }
 
@@ -139,6 +156,7 @@ export default function BetCard({ bet, onUpdate, onTrade, onSettle, onDelete }: 
     } catch (error) {
       console.error('Error checking latest state:', error);
       alert('Failed to check latest state. Please try again.');
+      window.location.reload();
     }
   };
 
