@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
-let clients = new Set<ReadableStreamController>();
+let clients = new Set<ReadableStreamDefaultController<Uint8Array>>();
 
 export async function GET() {
   const stream = new ReadableStream({
