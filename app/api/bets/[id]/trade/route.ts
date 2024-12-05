@@ -97,11 +97,13 @@ export async function POST(
       (${trade.taker.username} hit ${trade.maker.username}'s ${type === 'buy' ? 'ask' : 'bid'})`
 
     await notifyClients()
+    console.log('Sending trade notification...')
     await sendNotification(
       'Trade Executed',
       `${trade.taker.username} ${type === 'buy' ? 'bought from' : 'sold to'} ${trade.maker.username} at ${trade.price}⚜️ (${bet.eventName})`,
       `/bets/${bet.id}`
     )
+    console.log('Trade notification sent')
 
     return NextResponse.json({ 
       trade: {
