@@ -44,11 +44,24 @@ export async function subscribeToPushNotifications() {
   }
 }
 
+async function clearServiceWorkers() {
+  if ('serviceWorker' in navigator) {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (const registration of registrations) {
+      await registration.unregister();
+    }
+    console.log('Service workers cleared');
+  }
+}
+
 export async function requestNotificationPermission() {
   if (!('Notification' in window)) {
     console.log('Notifications not supported');
     return false;
   }
+
+  // Clear existing service workers first
+  await clearServiceWorkers();
 
   const permission = await Notification.requestPermission();
   if (permission === 'granted') {

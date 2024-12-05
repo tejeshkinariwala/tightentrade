@@ -16,6 +16,16 @@ export default function RootLayout({
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [isSupported, setIsSupported] = useState(true);
 
+  const testNotification = async () => {
+    try {
+      const response = await fetch('/api/test-notification');
+      const data = await response.json();
+      console.log('Test notification response:', data);
+    } catch (error) {
+      console.error('Test notification error:', error);
+    }
+  };
+
   useEffect(() => {
     // Check if notifications are supported
     const supported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
@@ -42,6 +52,14 @@ export default function RootLayout({
             className="fixed bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded"
           >
             {isSupported ? 'Enable Notifications' : 'Notifications Not Supported'}
+          </button>
+        )}
+        {notificationsEnabled && (
+          <button
+            onClick={testNotification}
+            className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Test Notification
           </button>
         )}
         <ThemeProvider>
