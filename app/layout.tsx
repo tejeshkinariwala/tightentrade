@@ -6,7 +6,7 @@ import { UserProvider } from './contexts/UserContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { EventProvider } from './contexts/EventContext';
 import { useEffect, useState } from 'react';
-import { requestNotificationPermission } from './utils/notifications';
+import { requestNotificationPermission, subscribeToPushNotifications } from './utils/notifications';
 
 export default function RootLayout({
   children,
@@ -18,6 +18,14 @@ export default function RootLayout({
 
   const testNotification = async () => {
     try {
+      // Check if service worker is registered
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      console.log('Current service workers:', registrations);
+      if (registrations.length === 0) {
+        console.log('No service worker found, registering again...');
+        await subscribeToPushNotifications();
+      }
+
       const response = await fetch('/api/test-notification');
       const data = await response.json();
       console.log('Test notification response:', data);

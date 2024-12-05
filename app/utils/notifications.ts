@@ -1,32 +1,41 @@
 export async function subscribeToPushNotifications() {
   try {
+    console.log('=== SUBSCRIBE START ===');
     if (!('serviceWorker' in navigator)) {
-      console.log('Service Workers not supported');
-      alert('Your browser does not support Service Workers');
+      console.error('Service Workers not supported');
       return false;
     }
     
     if (!('PushManager' in window)) {
-      console.log('Push notifications not supported');
-      alert('Your browser does not support Push Notifications');
+      console.error('Push notifications not supported');
       return false;
     }
 
-    // Unregister any existing service workers
-    const registrations = await navigator.serviceWorker.getRegistrations();
-    for (const registration of registrations) {
+    // First unregister any existing service workers
+    const existingRegistrations = await navigator.serviceWorker.getRegistrations();
+    console.log('Existing service workers:', existingRegistrations.length);
+    for (const registration of existingRegistrations) {
       await registration.unregister();
+      console.log('Unregistered service worker');
     }
 
-    const registration = await navigator.serviceWorker.register('/service-worker.js');
-    console.log('Service Worker registered');
+    // Register new service worker
+    console.log('Registering new service worker...');
+    const registration = await navigator.serviceWorker.register('/service-worker.js', {
+      scope: '/'
+    });
+    console.log('Service Worker registered:', registration);
 
+    // Get push subscription
+    console.log('Getting push subscription...');
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
     });
     console.log('Push subscription created:', subscription);
 
+    // Store subscription in backend
+    console.log('Storing subscription...');
     const response = await fetch('/api/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -37,9 +46,10 @@ export async function subscribeToPushNotifications() {
       throw new Error('Failed to store subscription');
     }
 
+    console.log('=== SUBSCRIBE END ===');
     return true;
   } catch (error) {
-    console.error('Error subscribing to push notifications:', error);
+    console.error('Subscription error:', error);
     return false;
   }
 }
