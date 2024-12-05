@@ -17,7 +17,7 @@ export async function sendNotification(title: string, body: string, url: string,
     console.log('Sending notification:', { title, body, url });
     
     const subscriptions = await db.pushSubscription.findMany();
-    console.log(`Found ${subscriptions.length} subscriptions`);
+    console.log('Raw subscriptions:', subscriptions);
 
     if (subscriptions.length === 0) {
       console.log('No subscriptions found - have you enabled notifications?');
@@ -26,7 +26,14 @@ export async function sendNotification(title: string, body: string, url: string,
 
     for (const subscription of subscriptions) {
       try {
-        console.log(`Attempting to send to subscription: ${subscription.endpoint}`);
+        console.log('Sending to subscription:', subscription);
+        const payload = JSON.stringify({
+          title,
+          body,
+          url,
+          actions
+        });
+        console.log('Payload:', payload);
         const result = await webpush.sendNotification(
           {
             endpoint: subscription.endpoint,
@@ -35,19 +42,15 @@ export async function sendNotification(title: string, body: string, url: string,
               auth: subscription.auth
             }
           },
-          JSON.stringify({
-            title,
-            body,
-            url,
-            actions
-          })
+          payload
         );
         console.log('Push service response:', result);
       } catch (error: any) {
-        console.error('Push service error:', {
+        console.error('Push service detailed error:', {
           code: error.statusCode,
           message: error.message,
-          body: error.body
+          body: error.body,
+          stack: error.stack
         });
       }
     }
