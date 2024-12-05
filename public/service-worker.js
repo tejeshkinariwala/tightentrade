@@ -2,9 +2,10 @@ self.addEventListener('push', function(event) {
   const data = event.data.json();
   const options = {
     body: data.body,
-    icon: '/icon.png', // Add an icon file to public folder
-    badge: '/badge.png', // Add a badge file to public folder
+    icon: '/icon.png',
+    badge: '/badge.png',
     data: data.url,
+    vibrate: [200, 100, 200],
     actions: data.actions
   };
 
