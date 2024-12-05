@@ -18,6 +18,8 @@ export async function PATCH(
   try {
     const data = await request.json();
     const { type, value, updaterName } = data;
+    console.log('=== PRICE UPDATE START ===');
+    console.log('Attempting to send notification for:', { type, value, updaterName });
 
     const existingBet = await prisma.bet.findUnique({
       where: { id: params.id }
@@ -114,13 +116,11 @@ export async function PATCH(
       `${updaterName} ${type === 'bid' ? 'raised bid to' : 'lowered ask to'} ${value}⚜️ on ${existingBet.eventName}`,
       `/bets/${existingBet.id}`
     );
+    console.log('=== PRICE UPDATE END ===');
     return NextResponse.json(updatedBet);
   } catch (error) {
     console.error('PATCH Error:', error);
-    return NextResponse.json({ 
-      error: String(error),
-      details: error instanceof Error ? error.stack : undefined 
-    }, { status: 500 });
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
 

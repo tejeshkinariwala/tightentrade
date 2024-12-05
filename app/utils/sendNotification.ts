@@ -2,10 +2,12 @@ import { PrismaClient } from '@prisma/client';
 import webpush from 'web-push';
 import { prisma } from '../lib/prisma';
 
-interface PushSubscriptionData {
+interface PushSubscription {
+  id: string;
   endpoint: string;
   p256dh: string;
   auth: string;
+  createdAt: Date;
 }
 
 webpush.setVapidDetails(
@@ -16,18 +18,20 @@ webpush.setVapidDetails(
 
 export async function sendNotification(title: string, body: string, url: string, actions?: any[]) {
   try {
-    console.log('Starting notification send:', { title, body, url });
-    const subscriptions = await prisma.pushSubscription.findMany() as PushSubscriptionData[];
-    console.log('Found subscriptions:', subscriptions.length);
+    console.log('=== NOTIFICATION START ===');
+    console.log('Sending notification:', { title, body, url });
+    
+    const subscriptions = await prisma.pushSubscription.findMany();
+    console.log(`Found ${subscriptions.length} subscriptions`);
 
     if (subscriptions.length === 0) {
-      console.log('No push subscriptions found');
+      console.log('No subscriptions found');
       return;
     }
 
     for (const subscription of subscriptions) {
       try {
-        console.log('Sending to subscription:', subscription.endpoint);
+        console.log(`Sending to: ${subscription.endpoint.slice(0, 50)}...`);
         await webpush.sendNotification(
           {
             endpoint: subscription.endpoint,
@@ -43,18 +47,19 @@ export async function sendNotification(title: string, body: string, url: string,
             actions
           })
         );
-        console.log('Successfully sent to:', subscription.endpoint);
-      } catch (error) {
-        console.error('Error sending to subscription:', error);
-        if ((error as any).statusCode === 410) {
-          console.log('Removing invalid subscription:', subscription.endpoint);
+        console.log('Successfully sent notification');
+      } catch (error: any) {
+        console.error('Failed to send notification:', error.message);
+        if (error.statusCode === 410) {
+          console.log('Removing expired subscription');
           await prisma.pushSubscription.delete({
             where: { endpoint: subscription.endpoint }
           });
         }
       }
     }
+    console.log('=== NOTIFICATION END ===');
   } catch (error) {
-    console.error('Error in sendNotification:', error);
+    console.error('Notification error:', error);
   }
 } 

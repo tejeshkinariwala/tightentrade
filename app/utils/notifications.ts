@@ -1,7 +1,14 @@
 export async function subscribeToPushNotifications() {
   try {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    if (!('serviceWorker' in navigator)) {
+      console.log('Service Workers not supported');
+      alert('Your browser does not support Service Workers');
+      return false;
+    }
+    
+    if (!('PushManager' in window)) {
       console.log('Push notifications not supported');
+      alert('Your browser does not support Push Notifications');
       return false;
     }
 
