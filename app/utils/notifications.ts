@@ -5,18 +5,30 @@ export async function subscribeToPushNotifications() {
       return false;
     }
 
+    // Unregister any existing service workers
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (const registration of registrations) {
+      await registration.unregister();
+    }
+
     const registration = await navigator.serviceWorker.register('/service-worker.js');
+    console.log('Service Worker registered');
+
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
     });
+    console.log('Push subscription created:', subscription);
 
-    // Send subscription to backend
-    await fetch('/api/push/subscribe', {
+    const response = await fetch('/api/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(subscription)
     });
+
+    if (!response.ok) {
+      throw new Error('Failed to store subscription');
+    }
 
     return true;
   } catch (error) {
