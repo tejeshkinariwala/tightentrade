@@ -14,10 +14,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isSupported, setIsSupported] = useState(true);
 
   useEffect(() => {
-    // Check if already subscribed
-    if ('Notification' in window) {
+    // Check if notifications are supported
+    const supported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+    setIsSupported(supported);
+
+    if (supported && 'Notification' in window) {
       setNotificationsEnabled(Notification.permission === 'granted');
     }
   }, []);
@@ -28,12 +32,16 @@ export default function RootLayout({
         {!notificationsEnabled && (
           <button
             onClick={async () => {
+              if (!isSupported) {
+                alert('Push notifications are not supported on this device/browser');
+                return;
+              }
               const enabled = await requestNotificationPermission();
               setNotificationsEnabled(enabled);
             }}
             className="fixed bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded"
           >
-            Enable Notifications
+            {isSupported ? 'Enable Notifications' : 'Notifications Not Supported'}
           </button>
         )}
         <ThemeProvider>
