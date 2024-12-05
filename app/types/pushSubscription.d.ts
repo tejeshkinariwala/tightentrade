@@ -1,9 +1,9 @@
-interface PushSubscriptionKeys {
-  p256dh: string;
-  auth: string;
-}
-
-interface PushSubscriptionData {
-  endpoint: string;
-  keys: PushSubscriptionKeys;
+declare namespace PrismaClient {
+  interface PushSubscription {
+    id: string;
+    endpoint: string;
+    p256dh: string;
+    auth: string;
+    createdAt: Date;
+  }
 } 

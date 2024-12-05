@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sendNotification } from '../../../utils/sendNotification';
+import { sendNotification } from '../../utils/sendNotification';
 
 export async function GET() {
   try {
