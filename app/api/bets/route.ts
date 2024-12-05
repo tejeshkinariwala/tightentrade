@@ -3,6 +3,7 @@ export const runtime = 'nodejs'
 import { NextResponse } from 'next/server';
 import { prisma } from '../../lib/prisma';
 import { notifyClients } from '../../lib/notify';
+import { sendNotification } from '../../utils/sendNotification';
 
 export async function GET() {
   try {
@@ -101,6 +102,11 @@ export async function POST(request: Request) {
     });
 
     await notifyClients();
+    await sendNotification(
+      'New Bet Created',
+      `${creatorName} created a new bet: ${eventName} (${notional}⚜️)`,
+      `/bets/${bet.id}`
+    );
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('POST Error:', error);

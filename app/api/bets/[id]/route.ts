@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '../../../lib/prisma'
 import type { PrismaClient } from '.prisma/client'
 import { notifyClients } from '../../../lib/notify'
+import { sendNotification } from '../../../utils/sendNotification'
 
 type TransactionClient = Omit<
   PrismaClient,
@@ -108,6 +109,11 @@ export async function PATCH(
     });
 
     await notifyClients();
+    await sendNotification(
+      'Price Update',
+      `${updaterName} ${type === 'bid' ? 'raised bid to' : 'lowered ask to'} ${value}⚜️ on ${existingBet.eventName}`,
+      `/bets/${existingBet.id}`
+    );
     return NextResponse.json(updatedBet);
   } catch (error) {
     console.error('PATCH Error:', error);

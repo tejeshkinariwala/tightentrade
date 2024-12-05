@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma, TransactionClient } from '../../../../lib/prisma'
 import type { PrismaClient } from '.prisma/client'
 import { notifyClients } from '../../../../lib/notify'
+import { sendNotification } from '../../../../utils/sendNotification'
 
 export const runtime = 'nodejs'
 
@@ -96,6 +97,11 @@ export async function POST(
       (${trade.taker.username} hit ${trade.maker.username}'s ${type === 'buy' ? 'ask' : 'bid'})`
 
     await notifyClients()
+    await sendNotification(
+      'Trade Executed',
+      `${trade.taker.username} ${type === 'buy' ? 'bought from' : 'sold to'} ${trade.maker.username} at ${trade.price}⚜️ (${bet.eventName})`,
+      `/bets/${bet.id}`
+    )
 
     return NextResponse.json({ 
       trade: {
